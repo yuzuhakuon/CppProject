@@ -21,6 +21,7 @@
 		"url": "https://github.com/yuzuhakuon/CppProject.git"
 	},
 	"homepage": "https://github.com/yuzuhakuon/CppProject/blob/master/README.md",
+	"icon": "logo.png",
 	"activationEvents": [
 		"onStartupFinished"
 	],
