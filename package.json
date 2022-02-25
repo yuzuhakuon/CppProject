@@ -1,10 +1,17 @@
 {
-	"name": "cppproject",
+	"name": "vscode-cpp-project",
 	"displayName": "CppProject",
 	"description": "cpp project helper",
+	"publisher": "yuzuhakuon",
 	"version": "0.0.1",
+	"keywords": [
+		"cpp",
+		"c++",
+		"project",
+		"debug"
+	],
 	"engines": {
-		"vscode": "^1.64.0"
+		"vscode": "^1.60.0"
 	},
 	"categories": [
 		"Other"
@@ -13,6 +20,7 @@
 		"type": "git",
 		"url": "https://github.com/yuzuhakuon/CppProject.git"
 	},
+	"homepage": "https://github.com/yuzuhakuon/CppProject/blob/master/README.md",
 	"activationEvents": [
 		"onStartupFinished"
 	],
