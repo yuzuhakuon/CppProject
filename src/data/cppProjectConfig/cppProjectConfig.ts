@@ -195,11 +195,11 @@ ForEachMacros:
 IncludeBlocks: Preserve
 IncludeCategories:
     - Regex: '^"(llvm|llvm-c|clang|clang-c)/'
-    Priority: 2
+      Priority: 2
     - Regex: '^(<|"(gtest|gmock|isl|json)/)'
-    Priority: 3
+      Priority: 3
     - Regex: ".*"
-    Priority: 1
+      Priority: 1
 IncludeIsMainRegex: "(Test)?$"
 IndentCaseLabels: true # false
 IndentPPDirectives: None
