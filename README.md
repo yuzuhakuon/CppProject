@@ -6,7 +6,8 @@ Some useful operations for C++ project.
 
 ## Features
 
-- Create a new c++ project. For this project, a `CmakeLists.txt` file is created and already contains the basic information, we can easily run and debug with configured vscode tasks.
+- `Create Cpp Project` Create new c++ project. For this project, a `CmakeLists.txt` file is created and already contains the basic information, we can easily run and debug with configured vscode tasks.
+- `Create Cpp Class` Create new c++ class. Input a valid class name, a `.h` and `.cpp` file are created in current working directory.
 
 ## How to use
 
