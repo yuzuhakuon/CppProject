@@ -6,7 +6,7 @@ import { Commands } from "../commands";
 import { createTasksFileString } from '../data/cppProjectConfig/tasksConfig';
 import { createSettingFileString } from '../data/cppProjectConfig/settingConfig';
 import { createConfiguration, createLaunchFileString } from '../data/cppProjectConfig/launchConfig';
-import { createClangFormatFileString, createCmakeFileString, createMainCppFileString } from '../data/cppProjectConfig/cppProjectConfig';
+import { createClangFormatFileString, createCmakeFileString, createCppHeaderFileString, createCppSourceFileString, createMainCppFileString } from '../data/cppProjectConfig/cppProjectConfig';
 
 export class ProjectController implements Disposable {
 
@@ -20,6 +20,9 @@ export class ProjectController implements Disposable {
         this.disposable = Disposable.from(
             vscode.commands.registerCommand(Commands.KUON_CPPPROJECT_CREATECPPPROJECT, () => {
                 this.createCppProject();
+            }),
+            vscode.commands.registerCommand(Commands.KUON_CPPPROJECT_CREATECPPCLASS, () => {
+                this.createNewClass();
             })
         );
     }
@@ -113,6 +116,40 @@ export class ProjectController implements Disposable {
         });
     }
 
+    public async createNewClass() {
+        const workspaceFolder = workspace.workspaceFolders?.[0];
+        if (!workspaceFolder) {
+            window.showErrorMessage('No workspace folder is open.');
+            return;
+        }
+
+        const className: string | undefined = await window.showInputBox({
+            prompt: "Input a class name",
+            placeHolder: "ClassName",
+            value: "ClassName",
+            ignoreFocusOut: true,
+            validateInput: async (name: string): Promise<string> => {
+                if (name && !name.match(/^[^*~/\\]+$/)) {
+                    return "Please input a valid class name";
+                }
+                return "";
+            },
+        });
+
+        if (!className) {
+            vscode.window.showWarningMessage("Class creation canceled");
+            return;
+        }
+
+        this.createClassFile(workspaceFolder.uri.fsPath, className);
+
+        const headerFilePath = path.join(workspaceFolder.uri.fsPath, `${className}.h`);
+        const headerFileUri = Uri.file(headerFilePath);
+        vscode.workspace.openTextDocument(headerFileUri).then(document => {
+            vscode.window.showTextDocument(document);
+        });
+    }
+
     private createTasksJsonFile(tasksJsonPath: string, force: boolean = false) {
         if (!fs.existsSync(tasksJsonPath) || force) {
             const content = createTasksFileString();
@@ -152,6 +189,19 @@ export class ProjectController implements Disposable {
         if (!fs.existsSync(clangFormatPath) || force) {
             const content = createClangFormatFileString();
             fs.writeFileSync(clangFormatPath, content);
+        }
+    }
+
+    private createClassFile(workDir: string, className: string) {
+        const headerFilePath = path.join(workDir, `${className}.h`);
+        const sourceFilePath = path.join(workDir, `${className}.cpp`);
+        if (!fs.existsSync(headerFilePath)) {
+            const content = createCppHeaderFileString(className);
+            fs.writeFileSync(headerFilePath, content);
+        }
+        if (!fs.existsSync(sourceFilePath)) {
+            const content = createCppSourceFileString(className);
+            fs.writeFileSync(sourceFilePath, content);
         }
     }
 }

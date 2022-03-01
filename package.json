@@ -31,6 +31,10 @@
 			{
 				"command": "kuon.cppproject.createcppproject",
 				"title": "Create Cpp Project"
+			},
+			{
+				"command": "kuon.cppproject.createcppclass",
+				"title": "Create Cpp Class"
 			}
 		]
 	},

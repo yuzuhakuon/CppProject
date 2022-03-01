@@ -79,9 +79,9 @@ export function getCCppStandardString(): CCppKeyValue {
 export function createCmakeFileString(programName: string, cppStandard: string): string {
     const generation = cppStandard.replace(/[^\d]/g, '');
     const cppStandardString = `
-    ${generation? '' : '# '}set(CMAKE_CXX_STANDARD ${generation})
-    ${generation? '' : '# '}set(CMAKE_CXX_STANDARD_REQUIRED ON)`;
-    
+    ${generation ? '' : '# '}set(CMAKE_CXX_STANDARD ${generation})
+    ${generation ? '' : '# '}set(CMAKE_CXX_STANDARD_REQUIRED ON)`;
+
     const cmake = `
         cmake_minimum_required(VERSION 3.13)
         project(${programName})
@@ -254,4 +254,47 @@ int main(int argc, char* argv[])
 }
     `;
     return mainCpp;
+}
+
+/**
+ * create c++ header file string
+ */
+export function createCppHeaderFileString(name: string) {
+    const words = name.split('_');
+    const className = words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
+    const cppHeader = `#ifndef INCLUDE_${name.toUpperCase()}_H
+#define INCLUDE_${name.toUpperCase()}_H
+
+class ${className}
+{
+public:
+    ${className}();
+    ~${className}();
+};
+
+#endif // !INCLUDE_${name.toUpperCase()}_H
+`;
+
+    return cppHeader;
+}
+
+/**
+ * create c++ source file string
+ */
+export function createCppSourceFileString(name: string) {
+    const words = name.split('_');
+    const className = words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
+    const cppSourceFile = `#include "${name}.h"
+
+${className}::${className}()
+{
+}
+
+${className}::~${className}()
+{
+}
+
+`;
+
+    return cppSourceFile;
 }
