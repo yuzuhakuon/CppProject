@@ -36,6 +36,12 @@
 				"command": "kuon.cppproject.createcppclass",
 				"title": "Create Cpp Class"
 			}
+		],
+		"snippets": [
+			{
+				"language": "cpp",
+				"path": "./snippets/cpp.json"
+			}
 		]
 	},
 	"scripts": {
