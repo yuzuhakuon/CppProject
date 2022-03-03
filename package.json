@@ -35,6 +35,10 @@
 			{
 				"command": "kuon.cppproject.createcppclass",
 				"title": "cppp: Create Cpp Class"
+			},
+			{
+				"command": "kuon.cppproject.createcompilecommandjson",
+				"title": "cppp: Create Compile Commands Json"
 			}
 		],
 		"snippets": [
@@ -73,6 +77,7 @@
 	},
 	"dependencies": {
 		"fs": "^0.0.1-security",
-		"path": "^0.12.7"
+		"path": "^0.12.7",
+		"xml-js": "^1.6.11"
 	}
 }

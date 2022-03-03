@@ -7,6 +7,7 @@ import { createTasksFileString } from '../data/cppProjectConfig/tasksConfig';
 import { createSettingFileString } from '../data/cppProjectConfig/settingConfig';
 import { createConfiguration, createLaunchFileString } from '../data/cppProjectConfig/launchConfig';
 import { createClangFormatFileString, createCmakeFileString, createCppHeaderFileString, createCppSourceFileString, createMainCppFileString } from '../data/cppProjectConfig/cppProjectConfig';
+import { CompileCommandParser } from '../parser/compileCommandParser';
 
 export class ProjectController implements Disposable {
 
@@ -23,7 +24,10 @@ export class ProjectController implements Disposable {
             }),
             vscode.commands.registerCommand(Commands.KUON_CPPPROJECT_CREATECPPCLASS, () => {
                 this.createNewClass();
-            })
+            }),
+            vscode.commands.registerCommand(Commands.KUON_CPPPROJECT_CREATECOMPILECOMMANDJSON, () => {
+                this.createCompileCommand();
+            }),
         );
     }
 
@@ -150,6 +154,36 @@ export class ProjectController implements Disposable {
         });
     }
 
+    public async createCompileCommand() {
+        const workspaceFolder = workspace.workspaceFolders?.[0];
+        if (!workspaceFolder) {
+            window.showErrorMessage('No workspace folder is open.');
+            return;
+        }
+
+        const buildFolder = path.join(workspaceFolder.uri.fsPath, 'build');
+        if (!fs.existsSync(buildFolder)) {
+            fs.mkdirSync(buildFolder);
+        }
+
+        const compileCommandsFilePath = path.join(buildFolder, 'compile_commands.json');
+        if (fs.existsSync(compileCommandsFilePath)) {
+            window.showInformationMessage('compile_commands.json already exists.');
+        }
+
+
+        const compileCommands = this.createCompileCommandJsonFile(buildFolder);
+        if(compileCommands.length === 0) {
+            window.showWarningMessage('Can not parse the project.');
+        }
+        fs.writeFileSync(compileCommandsFilePath, JSON.stringify(compileCommands, null, 4));
+
+        const compileCommandsFileUri = Uri.file(compileCommandsFilePath);
+        vscode.workspace.openTextDocument(compileCommandsFileUri).then(document => {
+            vscode.window.showTextDocument(document);
+        });
+    }
+
     private createTasksJsonFile(tasksJsonPath: string, force: boolean = false) {
         if (!fs.existsSync(tasksJsonPath) || force) {
             const content = createTasksFileString();
@@ -203,5 +237,31 @@ export class ProjectController implements Disposable {
             const content = createCppSourceFileString(className);
             fs.writeFileSync(sourceFilePath, content);
         }
+    }
+
+    private createCompileCommandJsonFile(buildPath: string) {
+        const slnFile = fs.readdirSync(buildPath).filter(function (file) {
+            return fs.statSync(path.join(buildPath, file)).isFile() && file.endsWith(".sln");
+        });
+        if (slnFile.length === 0) {
+            return [];
+        }
+
+        const fileNameWithoutExtension = slnFile[0].split('.')[0];
+        const vsxprojFilePath = path.join(buildPath, `${fileNameWithoutExtension}.vcxproj`);
+        const filterFilePath = path.join(buildPath, `${fileNameWithoutExtension}.vcxproj.filters`);
+        if (!fs.existsSync(vsxprojFilePath)) {
+            return [];
+        }
+        if (!fs.existsSync(filterFilePath)) {
+            return [];
+        }
+
+        const vsxprojFileContent = fs.readFileSync(vsxprojFilePath, 'utf8');
+        const filterFileContent = fs.readFileSync(filterFilePath, 'utf8');
+        const parser = new CompileCommandParser(buildPath, vsxprojFileContent, filterFileContent);
+        const compileCommands = parser.parse();
+
+        return compileCommands;
     }
 }
