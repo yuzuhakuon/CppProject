@@ -30,11 +30,11 @@
 		"commands": [
 			{
 				"command": "kuon.cppproject.createcppproject",
-				"title": "Create Cpp Project"
+				"title": "cppp: Create Cpp Project"
 			},
 			{
 				"command": "kuon.cppproject.createcppclass",
-				"title": "Create Cpp Class"
+				"title": "cppp: Create Cpp Class"
 			}
 		],
 		"snippets": [
