@@ -3,7 +3,7 @@
 	"displayName": "CppProject",
 	"description": "cpp project helper",
 	"publisher": "yuzuhakuon",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"keywords": [
 		"cpp",
 		"c++",
@@ -30,11 +30,21 @@
 		"commands": [
 			{
 				"command": "kuon.cppproject.createcppproject",
-				"title": "Create Cpp Project"
+				"title": "cppp: Create Cpp Project"
 			},
 			{
 				"command": "kuon.cppproject.createcppclass",
-				"title": "Create Cpp Class"
+				"title": "cppp: Create Cpp Class"
+			},
+			{
+				"command": "kuon.cppproject.createcompilecommandjson",
+				"title": "cppp: Create Compile Commands Json"
+			}
+		],
+		"snippets": [
+			{
+				"language": "cpp",
+				"path": "./snippets/cpp.json"
 			}
 		]
 	},
@@ -67,6 +77,7 @@
 	},
 	"dependencies": {
 		"fs": "^0.0.1-security",
-		"path": "^0.12.7"
+		"path": "^0.12.7",
+		"xml-js": "^1.6.11"
 	}
 }

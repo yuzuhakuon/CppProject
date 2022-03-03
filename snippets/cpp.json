@@ -1,0 +1,36 @@
+{
+    "CPP_PAUSE": {
+        "prefix": "PAUSE",
+        "body": [
+            "system(\"pause\");"
+        ],
+        "description": "pause"
+    },
+    "HEAD_CPP": {
+        "prefix": "HEAD_CPP",
+        "body": [
+            "#include<iostream>",
+            "#include<fstream>",
+            "#include<algorithm>",
+            "#include<string>",
+            "#include<vector>",
+            "using namespace std;",
+            "\n\n",
+            "int main()",
+            "{",
+            "\t${0}",
+            "\tsystem(\"pause\");",
+            "\treturn 0;",
+            "}"
+        ],
+        "description": "simple C++ program"
+    },
+    "DEFINE_INCLUDE": {
+        "prefix": "INC",
+        "body": [
+            "#pragma once",
+            "#ifndef ${1:INCLUDE_${TM_FILENAME_BASE/(.*)$/${1:/upcase}_H_/i}} \n#define $1 \n${0:}\n#endif // !$1"
+        ],
+        "description": "include guard"
+    }
+}
