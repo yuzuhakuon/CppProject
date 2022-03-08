@@ -118,6 +118,24 @@ export class ProjectController implements Disposable {
         vscode.workspace.openTextDocument(mainFiletUri).then(document => {
             vscode.window.showTextDocument(document);
         });
+
+        // create bin folder
+        const binFolder = path.join(workspaceFolder.uri.fsPath, 'bin');
+        if (!fs.existsSync(binFolder)) {
+            fs.mkdirSync(binFolder);
+        }
+
+        // create lib folder
+        const libFolder = path.join(workspaceFolder.uri.fsPath, 'lib');
+        if (!fs.existsSync(libFolder)) {
+            fs.mkdirSync(libFolder);
+        }
+
+        // create include folder
+        const includeFolder = path.join(workspaceFolder.uri.fsPath, 'include');
+        if (!fs.existsSync(includeFolder)) {
+            fs.mkdirSync(includeFolder);
+        }
     }
 
     public async createNewClass() {
@@ -173,7 +191,7 @@ export class ProjectController implements Disposable {
 
 
         const compileCommands = this.createCompileCommandJsonFile(buildFolder);
-        if(compileCommands.length === 0) {
+        if (compileCommands.length === 0) {
             window.showWarningMessage('Can not parse the project.');
         }
         fs.writeFileSync(compileCommandsFilePath, JSON.stringify(compileCommands, null, 4));
