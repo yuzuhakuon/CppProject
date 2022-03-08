@@ -16,6 +16,9 @@
 	"categories": [
 		"Other"
 	],
+	"extensionDependencies": [
+		"ms-vscode.cpptools"
+	],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/yuzuhakuon/CppProject.git"
