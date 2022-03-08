@@ -239,8 +239,8 @@ SpacesInParentheses: false
 SpacesInSquareBrackets: false
 Standard: Cpp11
 TabWidth: 8
-UseTab: Never    
-    `;
+UseTab: Never
+`;
     return clangFormat;
 }
 
