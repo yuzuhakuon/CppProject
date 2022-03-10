@@ -42,12 +42,68 @@
 			{
 				"command": "kuon.cppproject.createcompilecommandjson",
 				"title": "cppp: Create Compile Commands Json"
+			},
+			{
+				"command": "kuon.pathcopycopy.copyunixpath",
+				"title": "Copy Unix Path"
+			},
+			{
+				"command": "kuon.pathcopycopy.copywindowspath",
+				"title": "Copy Windows Path"
+			},
+			{
+				"command": "kuon.pathcopycopy.copywslpath",
+				"title": "Copy Wsl Path"
+			},
+			{
+				"command": "kuon.pathcopycopy.copyunixpath.relative",
+				"title": "Copy Unix Relative Path"
+			},
+			{
+				"command": "kuon.pathcopycopy.copywindowspath.relative",
+				"title": "Copy Windows Relative Path"
 			}
 		],
 		"snippets": [
 			{
 				"language": "cpp",
 				"path": "./snippets/cpp.json"
+			}
+		],
+		"menus": {
+			"explorer/context": [
+				{
+                    "submenu": "pathcopycopy.menu",
+					"group": "5_cutcopypaste"
+                }
+			],
+			"pathcopycopy.menu": [
+				{
+					"command": "kuon.pathcopycopy.copyunixpath",
+					"group": "1_copyabsolutepath"
+				},
+				{
+					"command": "kuon.pathcopycopy.copywindowspath",
+					"group": "1_copyabsolutepath"
+				},
+				{
+					"command": "kuon.pathcopycopy.copywslpath",
+					"group": "1_copyabsolutepath"
+				},
+				{
+					"command": "kuon.pathcopycopy.copyunixpath.relative",
+					"group": "2_copyrelativepath"
+				},
+				{
+					"command": "kuon.pathcopycopy.copywindowspath.relative",
+					"group": "2_copyrelativepath"
+				}
+			]
+		},
+		"submenus": [
+			{
+				"id": "pathcopycopy.menu",
+				"label": "Path Copy Copy"
 			}
 		]
 	},
