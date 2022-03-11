@@ -9,6 +9,7 @@ Some useful operations for C++ project.
 - `Create Cpp Project` Create new c++ project. For this project, a `CmakeLists.txt` file is created and already contains the basic information, we can easily run and debug with configured vscode tasks.
 - `Create Cpp Class` Create new c++ class. Input a valid class name, a `.h` and `.cpp` file are created in current working directory.
 - `Create Compile Commands Json` Create a `compile_commands.json` file for current project when you build the project with visual studio, but it's just a temporary solution. It's better to use `cmake` to generate compile_commands.json file.
+- `Path Copy Copy` Copy the path of current file or folder which you select to clipboard. `Path Copy Copy` adds contextual menu items on all files and folders allowing the user to copy the path in various formats.
 
 ## How to use
 
