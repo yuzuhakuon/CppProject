@@ -32,5 +32,47 @@
             "#ifndef ${1:INCLUDE_${TM_FILENAME_BASE/(.*)$/${1:/upcase}_H_/i}} \n#define $1 \n${0:}\n#endif // !$1"
         ],
         "description": "include guard"
+    },
+    "SINGLETON": {
+        "prefix": "SINGLETON",
+        "body": [
+            "class ${1:Singleton}",
+            "{",
+            "\tpublic:",
+            "\t\tstatic ${1:Singleton}& GetInstance()",
+            "\t\t{",
+            "\t\t\tstatic ${1:Singleton} instance;",
+            "\t\t\treturn instance;",
+            "\t\t}",
+            "\tprivate:",
+            "\t\t${1:Singleton}() {}",
+            "\t\t${1:Singleton}(${1:Singleton} const&);",
+            "\t\t${1:Singleton}& operator=(${1:Singleton} const&);",
+            "};"
+        ],
+        "description": "singleton"
+    },
+    "TMP_SINGLETON": {
+        "prefix": "SINGLETON",
+        "body": [
+            "template <class T>",
+            "class Singleton",
+            "{",
+            "public:",
+            "\tstatic T& GetInstance()",
+            "\t{",
+            "\t\tstatic T instance;",
+            "\t\treturn instance;",
+            "\t}",
+            "private:",
+            "\tSingleton(Singleton const&);",
+            "\tSingleton(Singleton &&);",
+            "\tSingleton& operator=(Singleton const&);",
+            "\tSingleton& operator=(Singleton &&);",
+            "protected:",
+            "\tSingleton() {}",
+            "};"
+        ],
+        "description": "singleton template"
     }
 }
