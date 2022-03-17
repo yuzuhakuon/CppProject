@@ -82,10 +82,14 @@ export class CompileCommandParser {
                             reg.test(element.trim()) && defines.push(element.trim());
                         });
                     }
-
-                    if(name.indexOf("Debug") >= 0) {
-                        defines.push("DEBUG");
-                        defines.push("_DEBUG");
+                }
+                if (itemDefinitionGroup[i].ResourceCompile.PreprocessorDefinitions) {
+                    const define = itemDefinitionGroup[i].ResourceCompile.PreprocessorDefinitions;
+                    if (define._text) {
+                        define._text.split(';').filter((element: string) => {
+                            var reg = /^[a-zA-Z0-9_]+$/;
+                            reg.test(element.trim()) && defines.push(element.trim());
+                        });
                     }
                 }
 
