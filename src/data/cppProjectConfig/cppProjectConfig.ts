@@ -87,7 +87,7 @@ export function createCmakeFileString(programName: string, cppStandard: string):
         project(${programName})
         ${cppStandardString}
 
-        # if use conan
+        # # if use conan
         # include(\${PROJECT_SOURCE_DIR}/build/conanbuildinfo.cmake)
         # conan_basic_setup()
 
@@ -100,18 +100,16 @@ export function createCmakeFileString(programName: string, cppStandard: string):
             set(CMAKE_C_FLAGS_RELEASE "\${CMAKE_C_FLAGS_RELEASE} -Wall -O3")
             add_definitions(-DNDEBUG -DRELEASE_MODE -DNDEBUG_MODE)
             message("Release mode:\${CMAKE_C_FLAGS_RELEASE}")
-        else()
-            set(CMAKE_C_FLAGS_RELEASE "\${CMAKE_C_FLAGS_RELEASE} -Wall -O3")
-            add_definitions(-DNDEBUG -DRELEASE_MODE -DNDEBUG_MODE)
-            message("else:\${CMAKE_BUILD_TYPE}")
-            message("else:\${CMAKE_C_FLAGS_RELEASE}")
         endif()
 
+        # the include path of project
         include_directories( \${PROJECT_SOURCE_DIR}/include/ )
         include_directories( \${PROJECT_SOURCE_DIR}/ )
 
+        # the library path of project
         link_directories( \${PROJECT_SOURCE_DIR}/lib )
 
+        # set output file
         set(CMAKE_RUNTIME_OUTPUT_DIRECTORY \${PROJECT_SOURCE_DIR}/bin)
         set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE \${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
         set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG \${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
@@ -252,7 +250,7 @@ int main(int argc, char* argv[])
     std::cout << "Hello, World!" << std::endl;
     return 0;
 }
-    `;
+`;
     return mainCpp;
 }
 

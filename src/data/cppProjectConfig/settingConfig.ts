@@ -2,6 +2,11 @@
 
 export function createSettingFileString(cppStandard: string, cStandard: string): string {
     const settings = {
+        // because of using changd, disable the C/C++ intellisense.
+        // if you want to use C/C++ intellisense, you can remove the following three line.
+        "C_Cpp.intelliSenseEngine": "Disabled",
+        "C_Cpp.autocomplete": "Disabled",
+        "C_Cpp.errorSquiggles": "Disabled",
         "C_Cpp.clang_format_fallbackStyle": "LLVM",
         "C_Cpp.clang_format_sortIncludes": true,
         "C_Cpp.default.cppStandard": cppStandard,
