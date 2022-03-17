@@ -189,12 +189,21 @@ export class ProjectController implements Disposable {
             window.showInformationMessage('compile_commands.json already exists.');
         }
 
-
         const compileCommands = this.createCompileCommandJsonFile(buildFolder);
-        if (compileCommands.length === 0) {
+        if (Object.keys(compileCommands).length === 0) {
             window.showWarningMessage('Can not parse the project.');
         }
-        fs.writeFileSync(compileCommandsFilePath, JSON.stringify(compileCommands, null, 4));
+
+        const typeOfCommand: string | undefined = await window.showQuickPick(Object.keys(compileCommands), {
+            placeHolder: "Select the config to create compile_commands.json",
+            ignoreFocusOut: true,
+        });
+        if (!typeOfCommand) {
+            vscode.window.showWarningMessage("Cpp project creation canceled");
+            return;
+        }
+
+        fs.writeFileSync(compileCommandsFilePath, JSON.stringify(compileCommands[typeOfCommand], null, 4));
 
         const compileCommandsFileUri = Uri.file(compileCommandsFilePath);
         vscode.workspace.openTextDocument(compileCommandsFileUri).then(document => {
@@ -262,17 +271,17 @@ export class ProjectController implements Disposable {
             return fs.statSync(path.join(buildPath, file)).isFile() && file.endsWith(".sln");
         });
         if (slnFile.length === 0) {
-            return [];
+            return {};
         }
 
         const fileNameWithoutExtension = slnFile[0].split('.')[0];
         const vsxprojFilePath = path.join(buildPath, `${fileNameWithoutExtension}.vcxproj`);
         const filterFilePath = path.join(buildPath, `${fileNameWithoutExtension}.vcxproj.filters`);
         if (!fs.existsSync(vsxprojFilePath)) {
-            return [];
+            return {};
         }
         if (!fs.existsSync(filterFilePath)) {
-            return [];
+            return {};
         }
 
         const vsxprojFileContent = fs.readFileSync(vsxprojFilePath, 'utf8');
