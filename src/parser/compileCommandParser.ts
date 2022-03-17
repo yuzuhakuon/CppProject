@@ -8,6 +8,17 @@ export interface ICompileCommand {
     file: string,
 }
 
+interface ItemDefinition {
+    name: string,
+    includes: string[],
+    defines: string[],
+    cppStandard: string,
+}
+
+interface CompileCommandConfig {
+    [key: string]: ICompileCommand[];
+}
+
 export class CompileCommandParser {
     private directory: string;
     private vcxprojContent: string;
@@ -18,26 +29,42 @@ export class CompileCommandParser {
         this.vcxprojFilterContent = vcxprojFilterContent;
     }
 
-    public parse(): ICompileCommand[] {
-        const compileCommandsArray: ICompileCommand[] = [];
-        const includes = this.parseVcxproj();
+    public parse(): CompileCommandConfig {
+        const compileCommandsGroup: CompileCommandConfig = {};
+        const items = this.parseVcxproj();
         const files = this.parseFilter();
 
-        for (let i = 0; i < files.length; i++) {
-            const file = path.basename(files[i]);
-            compileCommandsArray.push(this.createCompileCommand(file, this.directory, includes));
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const compileCommandArray: ICompileCommand[] = [];
+            for (let j = 0; j < files.length; j++) {
+                const file = path.basename(files[j]);
+                const compileCommand = this.createCompileCommand(file, this.directory, item);
+                compileCommandArray.push(compileCommand);
+            }
+
+            compileCommandsGroup[item.name] = compileCommandArray;
         }
 
-        return compileCommandsArray;
+        return compileCommandsGroup;
     }
 
-    private parseVcxproj(): string[] {
-        const includes: string[] = [];
+    private parseVcxproj(): ItemDefinition[] {
+        const items: ItemDefinition[] = [];
         const json = convert.xml2js(this.vcxprojContent, { compact: true, spaces: 4 });
 
         const itemDefinitionGroup = json.Project.ItemDefinitionGroup;
         if (itemDefinitionGroup.length) {
             for (let i = 0; i < itemDefinitionGroup.length; i++) {
+                let name: string = "";
+                const includes: string[] = [];
+                const defines: string[] = [];
+                let cppStandard: string = "c++11";
+
+                if (itemDefinitionGroup[i]._attributes.Condition) {
+                    const rawName = itemDefinitionGroup[i]._attributes.Condition.split("==")[1].trim();
+                    name = rawName.substring(1, rawName.length - 1);
+                }
                 if (itemDefinitionGroup[i].ClCompile.AdditionalIncludeDirectories) {
                     const include = itemDefinitionGroup[i].ClCompile.AdditionalIncludeDirectories;
                     if (include._text) {
@@ -47,10 +74,46 @@ export class CompileCommandParser {
                     }
                 }
 
+                if (itemDefinitionGroup[i].ClCompile.PreprocessorDefinitions) {
+                    const define = itemDefinitionGroup[i].ClCompile.PreprocessorDefinitions;
+                    if (define._text) {
+                        define._text.split(';').filter((element: string) => {
+                            var reg = /^[a-zA-Z0-9_]+$/;
+                            reg.test(element.trim()) && defines.push(element.trim());
+                        });
+                    }
+                }
+                if (itemDefinitionGroup[i].ResourceCompile.PreprocessorDefinitions) {
+                    const define = itemDefinitionGroup[i].ResourceCompile.PreprocessorDefinitions;
+                    if (define._text) {
+                        define._text.split(';').filter((element: string) => {
+                            var reg = /^[a-zA-Z0-9_]+$/;
+                            reg.test(element.trim()) && defines.push(element.trim());
+                        });
+                    }
+                }
+
+                if (itemDefinitionGroup[i].ClCompile.LanguageStandard) {
+                    const languageStandard = itemDefinitionGroup[i].ClCompile.LanguageStandard._text;
+                    const generation = languageStandard.replace(/[^\d]/g, '');
+                    if (generation) {
+                        cppStandard = `c++${generation}`;
+                    }
+                }
+
+                if (name) {
+                    const item: ItemDefinition = {
+                        name: name,
+                        includes: [...new Set(includes)],
+                        defines: [...new Set(defines)],
+                        cppStandard: cppStandard,
+                    };
+                    items.push(item);
+                }
             }
         }
 
-        return [...new Set(includes)];
+        return items;
     }
 
     private parseFilter(): string[] {
@@ -79,17 +142,24 @@ export class CompileCommandParser {
         return files;
     }
 
-    private createCompileCommand(file: string, directory: string, includes: string[]): ICompileCommand {
+    private createCompileCommand(file: string, directory: string, item: ItemDefinition): ICompileCommand {
         const fileNameWithoutExtension = path.basename(file, path.extname(file));
         const compileCommand: ICompileCommand = {
             directory: directory,
             arguments: ["g++"],
             file: file,
         };
+        const includes = item.includes;
+        const defines = item.defines;
+        const cppStandard = item.cppStandard;
+
         for (let i = 0; i < includes.length; i++) {
-            const include = includes[i];
-            compileCommand.arguments.push("-I" + include);
+            compileCommand.arguments.push("-I" + includes[i]);
         }
+        for (let i = 0; i < defines.length; i++) {
+            compileCommand.arguments.push("-D" + defines[i]);
+        }
+        compileCommand.arguments.push("-std=" + cppStandard);
         compileCommand.arguments.push(...["-c", "-o", fileNameWithoutExtension + ".o", file]);
 
         return compileCommand;
