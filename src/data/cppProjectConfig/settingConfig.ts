@@ -5,7 +5,7 @@ export function createSettingFileString(cppStandard: string, cStandard: string):
         // because of using changd, disable the C/C++ intellisense.
         // if you want to use C/C++ intellisense, you can remove the following three line.
         // if C/Cpp and clangd are in conflict, you can disable C/Cpp intelli sense engine.
-        "C_Cpp.intelliSenseEngine": "Default",
+        "C_Cpp.intelliSenseEngine": "Disabled",
         "C_Cpp.autocomplete": "Disabled",
         "C_Cpp.errorSquiggles": "Disabled",
         "C_Cpp.clang_format_fallbackStyle": "LLVM",

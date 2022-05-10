@@ -87,9 +87,18 @@ export function createCmakeFileString(programName: string, cppStandard: string):
         project(${programName})
         ${cppStandardString}
 
+        # cuda tips
+        # project(CppProject LANGUAGES CXX CUDA)
+        # enable_language(CUDA)
+
         # # if use conan
         # include(\${PROJECT_SOURCE_DIR}/build/conanbuildinfo.cmake)
         # conan_basic_setup()
+
+        # if windows
+        IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
+        add_compile_options(/utf-8)
+        endif()
 
         # build type
         if(CMAKE_BUILD_TYPE AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
