@@ -221,12 +221,10 @@ function createReleaseMingwTask(): ITask[] {
 // if use linux, use gcc
 export function createTasks(): ITask[] {
     const tasks: ITask[] = [];
-    if (process.platform === "win32") {
-        tasks.push(...createDebugMsvcTask(), ...createReleaseMsvcTask());
-        tasks.push(...createDebugMingwTask(), ...createReleaseMingwTask());
-    } else if (process.platform === "linux") {
-        tasks.push(...createDebugGccTask(), ...createReleaseGccTask());
-    }
+
+    tasks.push(...createDebugMsvcTask(), ...createReleaseMsvcTask());
+    tasks.push(...createDebugMingwTask(), ...createReleaseMingwTask());
+    tasks.push(...createDebugGccTask(), ...createReleaseGccTask());
 
     return tasks;
 }
