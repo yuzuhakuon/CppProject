@@ -96,7 +96,11 @@ export class ProjectController implements Disposable {
         this.createSettingsJsonFile(settingJsonPath, "c++20", "c17", forceReplace);
 
         // main.cpp
-        const mainCppPath = path.join(workspaceFolder.uri.fsPath, 'main.cpp');
+        const mainCppDir = path.join(workspaceFolder.uri.fsPath, "src");
+        if(!fs.existsSync(mainCppDir)) {
+            fs.mkdirSync(mainCppDir);
+        }
+        const mainCppPath = path.join(mainCppDir, 'main.cpp');
         this.createMainCppFile(mainCppPath, forceReplace);
 
         // cmake

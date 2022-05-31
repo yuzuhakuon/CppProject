@@ -83,12 +83,20 @@ export function createCmakeFileString(programName: string, cppStandard: string):
     ${generation ? '' : '# '}set(CMAKE_CXX_STANDARD_REQUIRED ON)`;
 
     const cmake = `
+        # cmake minimum required version
         cmake_minimum_required(VERSION 3.13)
+        
+        # project name
         project(${programName})
+        
+        
         ${cppStandardString}
+        # set(CMAKE_C_STANDARD 17)
+        # set(CMAKE_C_STANDARD_REQUIRED True)
+
 
         # cuda tips
-        # project(CppProject LANGUAGES CXX CUDA)
+        # project(${programName} LANGUAGES CXX CUDA)
         # enable_language(CUDA)
 
         # # if use conan
@@ -111,23 +119,31 @@ export function createCmakeFileString(programName: string, cppStandard: string):
             message("Release mode:\${CMAKE_C_FLAGS_RELEASE}")
         endif()
 
-        # the include path of project
-        include_directories( \${PROJECT_SOURCE_DIR}/include/ )
-        include_directories( \${PROJECT_SOURCE_DIR}/ )
 
-        # the library path of project
-        link_directories( \${PROJECT_SOURCE_DIR}/lib )
+        message("Identifying the OS...")
+        if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+        message("This is Windows.")
+        add_compile_options(/utf-8)
+        elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
+        message("This is Linux.")
+        elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+        message("This is Mac OS X.")
+        endif()
 
-        # set output file
-        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY \${PROJECT_SOURCE_DIR}/bin)
-        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE \${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG \${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
-        # add source files
-        aux_source_directory( \${PROJECT_SOURCE_DIR} SourceList)
+        add_executable(\${PROJECT_NAME})
+        # target_compile_definitions(\${PROJECT_NAME} PRIVATE FOO)
+        aux_source_directory(src DIR_SRCS) 
+        target_sources(\${PROJECT_NAME} PRIVATE \${DIR_SRCS})
+        target_include_directories(\${PROJECT_NAME} PUBLIC \${PROJECT_SOURCE_DIR}/include)
+        # target_link_directories(foo PUBLIC \${PROJECT_SOURCE_DIR}/lib)
 
-        # compile
-        add_executable( \${PROJECT_NAME} \${SourceList})
+        set_target_properties(\${PROJECT_NAME}
+            PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../lib"
+            LIBRARY_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../lib"
+            RUNTIME_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../bin"
+        )
     `;
 
     return getLines(cmake).join('\n');

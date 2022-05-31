@@ -123,15 +123,14 @@ function createReleaseMingwConfiguration(programName: string): ILaunchConfigurat
 // if use linux, use gcc
 export function createConfiguration(programName: string): ILaunchConfiguration[] {
     const configs: ILaunchConfiguration[] = [];
-    if (process.platform === "win32") {
-        configs.push(createDebugMsvcConfiguration(programName));
-        configs.push(createDebugMingwConfiguration(programName));
-        configs.push(createReleaseMsvcConfiguration(programName));
-        configs.push(createReleaseMingwConfiguration(programName));
-    } else if (process.platform === "linux") {
-        configs.push(createDebugGccConfiguration(programName));
-        configs.push(createReleaseGccConfiguration(programName));
-    }
+
+    configs.push(createDebugMsvcConfiguration(programName));
+    configs.push(createDebugMingwConfiguration(programName));
+    configs.push(createReleaseMsvcConfiguration(programName));
+    configs.push(createReleaseMingwConfiguration(programName));
+    configs.push(createDebugGccConfiguration(programName));
+    configs.push(createReleaseGccConfiguration(programName));
+
     return configs;
 }
 
