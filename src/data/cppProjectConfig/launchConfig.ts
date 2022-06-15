@@ -28,7 +28,7 @@ function createDefaultLaunchConfiguration(): ILaunchConfiguration {
         program: "",
         args: [],
         stopAtEntry: true,
-        cwd: "${workspaceFolder}/bin",
+        cwd: "${workspaceFolder}",
         environment: [
             {
                 "name": "PATH",
