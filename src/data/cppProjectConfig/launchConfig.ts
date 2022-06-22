@@ -13,6 +13,7 @@ interface ILaunchConfiguration {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     MIMode?: string;
     miDebuggerPath?: string;
+    setupCommands?: { [key: string]: boolean | string }[];
 }
 
 interface ILaunch {
@@ -119,17 +120,71 @@ function createReleaseMingwConfiguration(programName: string): ILaunchConfigurat
     return config;
 }
 
-// if use windows, use msvc and mingw
-// if use linux, use gcc
+function createLinuxCmakeToolConfiguration(): ILaunchConfiguration {
+    const config: ILaunchConfiguration = createDefaultLaunchConfiguration();
+
+    config.name = "LinuxCmakeToolLaunch";
+    config.type = "cppdbg";
+    config.program = "${command:cmake.launchTargetPath}";
+    config.MIMode = "gdb";
+    config.environment = [
+        {
+            // add the directory where our target was built to the PATHs
+            // it gets resolved by CMake Tools:
+            "name": "PATH",
+            "value": "${env:PATH}:${command:cmake.getLaunchTargetDirectory}"
+        },
+        {
+            "name": "OTHER_VALUE",
+            "value": "Something something"
+        }
+    ];
+    config.setupCommands = [
+        {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+        }
+    ];
+
+    return config;
+}
+
+function createWinCmakeToolConfiguration(): ILaunchConfiguration {
+    const config: ILaunchConfiguration = createDefaultLaunchConfiguration();
+
+    config.name = "WinCmakeToolLaunch";
+    config.type = "cppvsdbg";
+    config.program = "${command:cmake.launchTargetPath}";
+    config.environment = [
+        {
+            // add the directory where our target was built to the PATHs
+            // it gets resolved by CMake Tools:
+            "name": "PATH",
+            "value": "${env:PATH}:${command:cmake.getLaunchTargetDirectory}"
+        },
+        {
+            "name": "OTHER_VALUE",
+            "value": "Something something"
+        }
+    ];
+
+    return config;
+}
+
 export function createConfiguration(programName: string): ILaunchConfiguration[] {
     const configs: ILaunchConfiguration[] = [];
 
-    configs.push(createDebugMsvcConfiguration(programName));
-    configs.push(createDebugMingwConfiguration(programName));
-    configs.push(createReleaseMsvcConfiguration(programName));
-    configs.push(createReleaseMingwConfiguration(programName));
-    configs.push(createDebugGccConfiguration(programName));
-    configs.push(createReleaseGccConfiguration(programName));
+    // configs.push(createDebugMsvcConfiguration(programName));
+    // configs.push(createDebugMingwConfiguration(programName));
+    // configs.push(createReleaseMsvcConfiguration(programName));
+    // configs.push(createReleaseMingwConfiguration(programName));
+    // configs.push(createDebugGccConfiguration(programName));
+    // configs.push(createReleaseGccConfiguration(programName));
+
+    configs.push(createWinCmakeToolConfiguration());
+    configs.push(createLinuxCmakeToolConfiguration());
+
 
     return configs;
 }

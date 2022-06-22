@@ -89,7 +89,6 @@ export function createCmakeFileString(programName: string, cppStandard: string):
         # project name
         project(${programName})
         
-        
         ${cppStandardString}
         # set(CMAKE_C_STANDARD 17)
         # set(CMAKE_C_STANDARD_REQUIRED True)
