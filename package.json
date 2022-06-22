@@ -16,7 +16,9 @@
 	"categories": [
 		"Other"
 	],
-	"extensionDependencies": [],
+	"extensionDependencies": [
+		"ms-vscode.cmake-tools"
+	],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/yuzuhakuon/CppProject.git"
@@ -71,9 +73,9 @@
 		"menus": {
 			"explorer/context": [
 				{
-                    "submenu": "pathcopycopy.menu",
+					"submenu": "pathcopycopy.menu",
 					"group": "5_cutcopypaste"
-                }
+				}
 			],
 			"pathcopycopy.menu": [
 				{
