@@ -134,18 +134,25 @@ export function createCmakeFileString(programName: string, cppStandard: string):
         add_executable(\${PROJECT_NAME})
         # target_compile_definitions(\${PROJECT_NAME} PRIVATE FOO)
         target_sources(\${PROJECT_NAME} PRIVATE \${DIR_SRCS})
-        target_include_directories(\${PROJECT_NAME} PUBLIC \${PROJECT_SOURCE_DIR}/include)
         # target_link_directories(foo PUBLIC \${PROJECT_SOURCE_DIR}/lib)
         # target_link_libraries(\${PROJECT_NAME} \${CONAN_LIBS})
 
-        set_target_properties(\${PROJECT_NAME}
-            PROPERTIES
-            ARCHIVE_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../lib"
-            LIBRARY_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../lib"
-            RUNTIME_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../bin"
-            RUNTIME_OUTPUT_DIRECTORY_DEBUG "\${CMAKE_BINARY_DIR}/../bin"
-            RUNTIME_OUTPUT_DIRECTORY_RELEASE "\${CMAKE_BINARY_DIR}/../bin"
-        )
+
+        foreach(_target \${PROJECT_NAME})
+            # target_sources({_target} PRIVATE )
+            target_include_directories(\${_target} PUBLIC \${PROJECT_SOURCE_DIR}/include)
+            set_target_properties(\${_target} PROPERTIES 
+                ARCHIVE_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../lib"
+                LIBRARY_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../lib"
+                RUNTIME_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../bin"
+                RUNTIME_OUTPUT_DIRECTORY_DEBUG "\${CMAKE_BINARY_DIR}/../bin"
+                RUNTIME_OUTPUT_DIRECTORY_RELEASE "\${CMAKE_BINARY_DIR}/../bin"
+                LIBRARY_OUTPUT_DIRECTORY_DEBUG "\${CMAKE_BINARY_DIR}/../bin"
+                LIBRARY_OUTPUT_DIRECTORY_RELEASE "\${CMAKE_BINARY_DIR}/../bin"
+                ARCHIVE_OUTPUT_DIRECTORY_DEBUG "\${CMAKE_BINARY_DIR}/../bin"
+                ARCHIVE_OUTPUT_DIRECTORY_RELEASE "\${CMAKE_BINARY_DIR}/../bin"
+            )
+        endforeach()
     `;
 
     return getLines(cmake).join('\n');
