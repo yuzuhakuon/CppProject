@@ -82,8 +82,7 @@ export function createCmakeFileString(programName: string, cppStandard: string):
     ${generation ? '' : '# '}set(CMAKE_CXX_STANDARD ${generation})
     ${generation ? '' : '# '}set(CMAKE_CXX_STANDARD_REQUIRED ON)`;
 
-    const cmake = `
-        # cmake minimum required version
+    const cmake = `# cmake minimum required version
         cmake_minimum_required(VERSION 3.13)
         
         # project name
@@ -99,6 +98,7 @@ export function createCmakeFileString(programName: string, cppStandard: string):
         # enable_language(CUDA)
 
         # # if use conan
+        # SET(CONAN_DISABLE_CHECK_COMPILER ON)
         # include(\${PROJECT_SOURCE_DIR}/build/conanbuildinfo.cmake)
         # conan_basic_setup()
         
