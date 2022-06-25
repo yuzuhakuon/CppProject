@@ -8,6 +8,8 @@ import { createSettingFileString } from '../data/cppProjectConfig/settingConfig'
 import { createConfiguration, createLaunchFileString } from '../data/cppProjectConfig/launchConfig';
 import { createClangFormatFileString, createCmakeFileString, createCppHeaderFileString, createCppSourceFileString, createMainCppFileString } from '../data/cppProjectConfig/cppProjectConfig';
 import { CompileCommandParser } from '../parser/compileCommandParser';
+import { fileContainer } from '../data/specialFilesConfig/conanFiles';
+import { mkdirRecursive } from '../common/utils';
 
 export class ProjectController implements Disposable {
 
@@ -27,6 +29,9 @@ export class ProjectController implements Disposable {
             }),
             vscode.commands.registerCommand(Commands.KUON_CPPPROJECT_CREATECOMPILECOMMANDJSON, () => {
                 this.createCompileCommand();
+            }),
+            vscode.commands.registerCommand(Commands.KUON_CPPPROJECT_ADDSPECIALFILE, () => {
+                this.addSpecialFile();
             }),
         );
     }
@@ -97,7 +102,7 @@ export class ProjectController implements Disposable {
 
         // main.cpp
         const mainCppDir = path.join(workspaceFolder.uri.fsPath, "src");
-        if(!fs.existsSync(mainCppDir)) {
+        if (!fs.existsSync(mainCppDir)) {
             fs.mkdirSync(mainCppDir);
         }
         const mainCppPath = path.join(mainCppDir, 'main.cpp');
@@ -213,6 +218,32 @@ export class ProjectController implements Disposable {
         vscode.workspace.openTextDocument(compileCommandsFileUri).then(document => {
             vscode.window.showTextDocument(document);
         });
+    }
+
+    public async addSpecialFile() {
+        const workspaceFolder = workspace.workspaceFolders?.[0];
+        if (!workspaceFolder) {
+            window.showErrorMessage('No workspace folder is open.');
+            return;
+        }
+
+        const fileTypes = fileContainer.map((x) => { return x.displayName; });
+        const fileTypeList = await window.showQuickPick(fileTypes, {
+            placeHolder: "Select the files you want to add to workspace.",
+            ignoreFocusOut: true,
+            canPickMany: true
+        });
+
+        fileContainer.filter((x) => { return fileTypeList?.includes(x.displayName); })
+            .map((obj) => {
+                obj.files.forEach((file) => {
+                    const absoultePath = path.join(workspaceFolder.uri.fsPath, file.path);
+                    if (!fs.existsSync(absoultePath) || file.overwrite) {
+                        mkdirRecursive(path.dirname(absoultePath));
+                        fs.writeFileSync(absoultePath, file.text);
+                    }
+                });
+            });
     }
 
     private createTasksJsonFile(tasksJsonPath: string, force: boolean = false) {

@@ -44,6 +44,10 @@
 				"title": "cppp: Create Compile Commands Json"
 			},
 			{
+				"command": "kuon.cppproject.addspecialfile",
+				"title": "cppp: Add Special File"
+			},
+			{
 				"command": "kuon.pathcopycopy.copyunixpath",
 				"title": "Copy Unix Path"
 			},
@@ -137,6 +141,7 @@
 	"dependencies": {
 		"fs": "^0.0.1-security",
 		"path": "^0.12.7",
+		"vscode": "^1.1.37",
 		"xml-js": "^1.6.11"
 	}
 }

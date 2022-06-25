@@ -3,6 +3,7 @@ export namespace Commands {
     export const KUON_CPPPROJECT_CREATECPPPROJECT = "kuon.cppproject.createcppproject";
     export const KUON_CPPPROJECT_CREATECPPCLASS = "kuon.cppproject.createcppclass";
     export const KUON_CPPPROJECT_CREATECOMPILECOMMANDJSON = "kuon.cppproject.createcompilecommandjson";
+    export const KUON_CPPPROJECT_ADDSPECIALFILE = "kuon.cppproject.addspecialfile";
 
     // Path Copy Copy Commands
     export const KUON_PATHCOPYCOPY_COPYUNIXPATH = "kuon.pathcopycopy.copyunixpath";
