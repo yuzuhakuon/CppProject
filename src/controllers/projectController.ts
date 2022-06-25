@@ -97,8 +97,8 @@ export class ProjectController implements Disposable {
         // this.createTasksJsonFile(tasksJsonPath, forceReplace);
 
         // settings.json
-        const settingJsonPath = path.join(vscodeConfigFolder, 'settings.json');
-        this.createSettingsJsonFile(settingJsonPath, "c++20", "c17", forceReplace);
+        // const settingJsonPath = path.join(vscodeConfigFolder, 'settings.json');
+        // this.createSettingsJsonFile(settingJsonPath, "c++20", "c17", forceReplace);
 
         // main.cpp
         const mainCppDir = path.join(workspaceFolder.uri.fsPath, "src");
@@ -194,30 +194,35 @@ export class ProjectController implements Disposable {
         }
 
         const compileCommandsFilePath = path.join(buildFolder, 'compile_commands.json');
-        if (fs.existsSync(compileCommandsFilePath)) {
-            window.showInformationMessage('compile_commands.json already exists.');
-        }
 
         const compileCommands = this.createCompileCommandJsonFile(buildFolder);
         if (Object.keys(compileCommands).length === 0) {
             window.showWarningMessage('Can not parse the project.');
         }
 
-        const typeOfCommand: string | undefined = await window.showQuickPick(Object.keys(compileCommands), {
-            placeHolder: "Select the config to create compile_commands.json",
-            ignoreFocusOut: true,
-        });
-        if (!typeOfCommand) {
-            vscode.window.showWarningMessage("Cpp project creation canceled");
-            return;
+        const buildType = await vscode.commands.executeCommand("cmake.buildType") as string;
+        const optionKeys = Object.keys(compileCommands)
+            .filter((x) => { return x.toLowerCase().indexOf(buildType.toLowerCase()) !== -1; });
+
+        if (optionKeys.length > 0) {
+            fs.writeFileSync(compileCommandsFilePath, JSON.stringify(compileCommands[optionKeys[0]], null, 4));
+        }
+        else {
+            const typeOfCommand: string | undefined = await window.showQuickPick(Object.keys(compileCommands), {
+                placeHolder: "Select the config to create compile_commands.json",
+                ignoreFocusOut: true,
+            });
+            if (!typeOfCommand) {
+                vscode.window.showWarningMessage("Cpp project creation canceled");
+                return;
+            }
+            fs.writeFileSync(compileCommandsFilePath, JSON.stringify(compileCommands[typeOfCommand], null, 4));
         }
 
-        fs.writeFileSync(compileCommandsFilePath, JSON.stringify(compileCommands[typeOfCommand], null, 4));
-
-        const compileCommandsFileUri = Uri.file(compileCommandsFilePath);
-        vscode.workspace.openTextDocument(compileCommandsFileUri).then(document => {
-            vscode.window.showTextDocument(document);
-        });
+        // const compileCommandsFileUri = Uri.file(compileCommandsFilePath);
+        // vscode.workspace.openTextDocument(compileCommandsFileUri).then(document => {
+        //     vscode.window.showTextDocument(document);
+        // });
     }
 
     public async addSpecialFile() {
