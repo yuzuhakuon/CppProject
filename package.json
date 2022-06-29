@@ -136,12 +136,12 @@
 		"ts-loader": "^9.2.5",
 		"typescript": "^4.4.4",
 		"webpack": "^5.52.1",
+		"vscode": "^1.1.37",
 		"webpack-cli": "^4.8.0"
 	},
 	"dependencies": {
 		"fs": "^0.0.1-security",
 		"path": "^0.12.7",
-		"vscode": "^1.1.37",
 		"xml-js": "^1.6.11"
 	}
 }
