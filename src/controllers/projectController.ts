@@ -188,16 +188,18 @@ export class ProjectController implements Disposable {
             return;
         }
 
-        const buildFolder = path.join(workspaceFolder.uri.fsPath, 'build');
-        if (!fs.existsSync(buildFolder)) {
-            fs.mkdirSync(buildFolder);
+        const launchTargetPath = await vscode.commands.executeCommand("cmake.launchTargetPath") as string;
+        const buildDirectory = await vscode.commands.executeCommand("cmake.buildDirectory") as string;
+        const buildTargetName = await vscode.commands.executeCommand("cmake.buildTargetName") as string;
+        if (!buildDirectory || !fs.existsSync(buildDirectory)) {
+            window.showErrorMessage('Can not find cmake cache files');
         }
 
-        const compileCommandsFilePath = path.join(buildFolder, 'compile_commands.json');
-
-        const compileCommands = this.createCompileCommandJsonFile(buildFolder);
+        const compileCommandsFilePath = path.join(buildDirectory, 'compile_commands.json');
+        const compileCommands = this.createCompileCommandJsonFile(buildDirectory, buildTargetName, launchTargetPath);
         if (Object.keys(compileCommands).length === 0) {
             window.showWarningMessage('Can not parse the project.');
+            return;
         }
 
         const buildType = await vscode.commands.executeCommand("cmake.buildType") as string;
@@ -306,17 +308,37 @@ export class ProjectController implements Disposable {
         }
     }
 
-    private createCompileCommandJsonFile(buildPath: string) {
-        const slnFile = fs.readdirSync(buildPath).filter(function (file) {
-            return fs.statSync(path.join(buildPath, file)).isFile() && file.endsWith(".sln");
-        });
-        if (slnFile.length === 0) {
-            return {};
-        }
+    private getTragetName(
+        buildPath: string, buildTargetName: string | undefined, launchTargetPath: string | undefined) {
+        const specialTarget = ["ALL_BUILD", "ZERO_CHECK"];
+        if (buildTargetName && !specialTarget.includes(buildTargetName)) {
+            return buildTargetName;
+        } else if (launchTargetPath) {
+            const basename = path.basename(launchTargetPath);
+            return basename.split('.')[0];
+        } else {
+            const slnFile = fs.readdirSync(buildPath).filter(function (file) {
+                const stat = fs.statSync(path.join(buildPath, file));
+                const isSlnFile = stat.isFile() && file.endsWith(".sln");
+                return isSlnFile;
+            });
 
-        const fileNameWithoutExtension = slnFile[0].split('.')[0];
-        const vsxprojFilePath = path.join(buildPath, `${fileNameWithoutExtension}.vcxproj`);
-        const filterFilePath = path.join(buildPath, `${fileNameWithoutExtension}.vcxproj.filters`);
+            if (slnFile.length === 0) {
+                return undefined;
+            }
+
+            const fileNameWithoutExtension = path.basename(slnFile[0]).split('.')[0];
+            return fileNameWithoutExtension;
+        }
+    }
+
+    private createCompileCommandJsonFile(
+        buildPath: string, buildTargetName: string | undefined, launchTargetPath: string | undefined) {
+
+        const targetName = this.getTragetName(buildPath, buildTargetName, launchTargetPath);
+
+        const vsxprojFilePath = path.join(buildPath, `${targetName}.vcxproj`);
+        const filterFilePath = path.join(buildPath, `${targetName}.vcxproj.filters`);
         if (!fs.existsSync(vsxprojFilePath)) {
             return {};
         }
