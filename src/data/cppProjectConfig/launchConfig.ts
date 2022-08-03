@@ -5,11 +5,10 @@ interface ILaunchConfiguration {
     program: string;
     cwd: string;
     args: string[];
-    environment: { [key: string]: string }[];
     preLaunchTask: string;
-    stopAtEntry: boolean;
-    console: string;
-    consoleArgs: string[];
+    environment?: { [key: string]: string }[];
+    stopAtEntry?: boolean;
+    console?: string;
     // eslint-disable-next-line @typescript-eslint/naming-convention
     MIMode?: string;
     miDebuggerPath?: string;
@@ -37,8 +36,7 @@ function createDefaultLaunchConfiguration(): ILaunchConfiguration {
             }
         ],
         console: "internalConsole",
-        preLaunchTask: "",
-        consoleArgs: [],
+        preLaunchTask: ""
     };
 }
 
@@ -120,10 +118,25 @@ function createReleaseMingwConfiguration(programName: string): ILaunchConfigurat
     return config;
 }
 
+function createLLVMConfiguration(): ILaunchConfiguration {
+    const config: ILaunchConfiguration = createDefaultLaunchConfiguration();
+
+    config.name = "LLVMLaunch";
+    config.type = "lldb";
+    config.program = "${command:cmake.launchTargetPath}";
+    config.MIMode = "lldb";
+
+    delete config.console;
+    delete config.environment;
+    delete config.stopAtEntry;
+
+    return config;
+}
+
 function createLinuxCmakeToolConfiguration(): ILaunchConfiguration {
     const config: ILaunchConfiguration = createDefaultLaunchConfiguration();
 
-    config.name = "LinuxCmakeToolLaunch";
+    config.name = "GNULaunch";
     config.type = "cppdbg";
     config.program = "${command:cmake.launchTargetPath}";
     config.MIMode = "gdb";
@@ -153,7 +166,7 @@ function createLinuxCmakeToolConfiguration(): ILaunchConfiguration {
 function createWinCmakeToolConfiguration(): ILaunchConfiguration {
     const config: ILaunchConfiguration = createDefaultLaunchConfiguration();
 
-    config.name = "WinCmakeToolLaunch";
+    config.name = "MSVCLaunch";
     config.type = "cppvsdbg";
     config.program = "${command:cmake.launchTargetPath}";
     config.environment = [

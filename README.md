@@ -22,6 +22,6 @@ Some useful operations for C++ project.
 
 - If you want to use this project, you need to install [Cmake](https://cmake.org/download/). It would be best if you install the latest version.
 - If you are on windows, you need to install [Visual Studio](https://visualstudio.microsoft.com/downloads/), or need to install [MinGW](https://www.mingw.org/download/).
-- If you are on linux, you need to install [GCC](https://gcc.gnu.org/install/).
+- If you are on linux, you need to install [GCC](https://gcc.gnu.org/install/), or need to install [LLVM](https://github.com/llvm/llvm-project/releases).
 
-In fact, this extension depends on other extension [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools),  [CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools), it would be better if you install it first.
+In fact, this extension depends on other extensions [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools),  [CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools), it would be better if you install them first. For llvm debug support, it needs [CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb).
