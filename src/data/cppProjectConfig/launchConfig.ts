@@ -118,7 +118,7 @@ function createReleaseMingwConfiguration(programName: string): ILaunchConfigurat
     return config;
 }
 
-function createLLVMConfiguration(): ILaunchConfiguration {
+function createLLVMLaunchConfiguration(): ILaunchConfiguration {
     const config: ILaunchConfiguration = createDefaultLaunchConfiguration();
 
     config.name = "LLVMLaunch";
@@ -133,7 +133,7 @@ function createLLVMConfiguration(): ILaunchConfiguration {
     return config;
 }
 
-function createLinuxCmakeToolConfiguration(): ILaunchConfiguration {
+function createGNULaunchConfiguration(): ILaunchConfiguration {
     const config: ILaunchConfiguration = createDefaultLaunchConfiguration();
 
     config.name = "GNULaunch";
@@ -163,7 +163,7 @@ function createLinuxCmakeToolConfiguration(): ILaunchConfiguration {
     return config;
 }
 
-function createWinCmakeToolConfiguration(): ILaunchConfiguration {
+function createMSVCLaunchConfiguration(): ILaunchConfiguration {
     const config: ILaunchConfiguration = createDefaultLaunchConfiguration();
 
     config.name = "MSVCLaunch";
@@ -195,8 +195,9 @@ export function createConfiguration(programName: string): ILaunchConfiguration[]
     // configs.push(createDebugGccConfiguration(programName));
     // configs.push(createReleaseGccConfiguration(programName));
 
-    configs.push(createWinCmakeToolConfiguration());
-    configs.push(createLinuxCmakeToolConfiguration());
+    configs.push(createMSVCLaunchConfiguration());
+    configs.push(createGNULaunchConfiguration());
+    configs.push(createLLVMLaunchConfiguration());
 
 
     return configs;
