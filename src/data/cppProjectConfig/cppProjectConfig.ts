@@ -117,8 +117,10 @@ export function createCmakeFileString(programName: string, cppStandard: string):
         message("Identifying the OS...")
         if (CMAKE_SYSTEM_NAME MATCHES "Windows")
         message("This is Windows.")
+        if (MSVC)
         add_compile_options(/utf-8)
         add_definitions(-D_CRT_SECURE_NO_WARNINGS -DUNICODE -D_UNICODE)
+        endif()
         elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
         message("This is Linux.")
         # add_compile_options(-fPIC)
@@ -141,15 +143,18 @@ export function createCmakeFileString(programName: string, cppStandard: string):
             # target_sources({_target} PRIVATE )
             target_include_directories(\${_target} PUBLIC \${PROJECT_SOURCE_DIR}/include)
             set_target_properties(\${_target} PROPERTIES 
-                ARCHIVE_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../lib"
-                LIBRARY_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../lib"
+                ARCHIVE_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../bin"
+                LIBRARY_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../bin"
                 RUNTIME_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../bin"
                 RUNTIME_OUTPUT_DIRECTORY_DEBUG "\${CMAKE_BINARY_DIR}/../bin"
                 RUNTIME_OUTPUT_DIRECTORY_RELEASE "\${CMAKE_BINARY_DIR}/../bin"
+                RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "\${CMAKE_BINARY_DIR}/../bin"
                 LIBRARY_OUTPUT_DIRECTORY_DEBUG "\${CMAKE_BINARY_DIR}/../bin"
                 LIBRARY_OUTPUT_DIRECTORY_RELEASE "\${CMAKE_BINARY_DIR}/../bin"
+                LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "\${CMAKE_BINARY_DIR}/../bin"
                 ARCHIVE_OUTPUT_DIRECTORY_DEBUG "\${CMAKE_BINARY_DIR}/../bin"
                 ARCHIVE_OUTPUT_DIRECTORY_RELEASE "\${CMAKE_BINARY_DIR}/../bin"
+                ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "\${CMAKE_BINARY_DIR}/../bin"
             )
         endforeach()
     `;

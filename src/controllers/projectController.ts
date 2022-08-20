@@ -97,8 +97,8 @@ export class ProjectController implements Disposable {
         // this.createTasksJsonFile(tasksJsonPath, forceReplace);
 
         // settings.json
-        // const settingJsonPath = path.join(vscodeConfigFolder, 'settings.json');
-        // this.createSettingsJsonFile(settingJsonPath, "c++20", "c17", forceReplace);
+        const settingJsonPath = path.join(vscodeConfigFolder, 'settings.json');
+        this.createSettingsJsonFile(settingJsonPath, "c++20", "c17", forceReplace);
 
         // main.cpp
         const mainCppDir = path.join(workspaceFolder.uri.fsPath, "src");
