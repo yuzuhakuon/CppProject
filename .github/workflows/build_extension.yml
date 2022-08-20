@@ -18,7 +18,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Install the dependencies
-        run: yarn && yarn add vsce
+        run: npm i -g vsce && yarn
 
       - name: Build
         run: vsce package
