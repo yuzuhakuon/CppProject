@@ -82,13 +82,11 @@ export function createCmakeFileString(programName: string, cppStandard: string):
     ${generation ? '' : '# '}set(CMAKE_CXX_STANDARD ${generation})
     ${generation ? '' : '# '}set(CMAKE_CXX_STANDARD_REQUIRED ON)`;
 
-    const cmake = `
-        # cmake minimum required version
+    const cmake = `# cmake minimum required version
         cmake_minimum_required(VERSION 3.13)
         
         # project name
         project(${programName})
-        
         
         ${cppStandardString}
         # set(CMAKE_C_STANDARD 17)
@@ -100,50 +98,65 @@ export function createCmakeFileString(programName: string, cppStandard: string):
         # enable_language(CUDA)
 
         # # if use conan
+        # SET(CONAN_DISABLE_CHECK_COMPILER ON)
         # include(\${PROJECT_SOURCE_DIR}/build/conanbuildinfo.cmake)
         # conan_basic_setup()
-
-        # if windows
-        IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
-        add_compile_options(/utf-8)
-        endif()
-
+        
         # build type
         if(CMAKE_BUILD_TYPE AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
-            set(CMAKE_C_FLAGS_DEBUG "\${CMAKE_C_FLAGS_DEBUG} -Wall -O0")
-            add_definitions(-DDEBUG -D_DEBUG -DDEBUG_MODE)
-            message("Debug mode:\${CMAKE_C_FLAGS_DEBUG}")
+        set(CMAKE_C_FLAGS_DEBUG "\${CMAKE_C_FLAGS_DEBUG} -Wall -O0")
+        add_definitions(-DDEBUG -D_DEBUG -DDEBUG_MODE)
+        message("Debug mode:\${CMAKE_C_FLAGS_DEBUG}")
         elseif(CMAKE_BUILD_TYPE AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
-            set(CMAKE_C_FLAGS_RELEASE "\${CMAKE_C_FLAGS_RELEASE} -Wall -O3")
-            add_definitions(-DNDEBUG -DRELEASE_MODE -DNDEBUG_MODE)
-            message("Release mode:\${CMAKE_C_FLAGS_RELEASE}")
+        set(CMAKE_C_FLAGS_RELEASE "\${CMAKE_C_FLAGS_RELEASE} -Wall -O3")
+        add_definitions(-DNDEBUG -DRELEASE_MODE -DNDEBUG_MODE)
+        message("Release mode:\${CMAKE_C_FLAGS_RELEASE}")
         endif()
 
-
+            
         message("Identifying the OS...")
         if (CMAKE_SYSTEM_NAME MATCHES "Windows")
         message("This is Windows.")
+        if (MSVC)
         add_compile_options(/utf-8)
+        add_definitions(-D_CRT_SECURE_NO_WARNINGS -DUNICODE -D_UNICODE)
+        endif()
         elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
         message("This is Linux.")
+        # add_compile_options(-fPIC)
         elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin")
         message("This is Mac OS X.")
         endif()
 
 
+        aux_source_directory(src DIR_SRCS)
+
+
         add_executable(\${PROJECT_NAME})
         # target_compile_definitions(\${PROJECT_NAME} PRIVATE FOO)
-        aux_source_directory(src DIR_SRCS) 
         target_sources(\${PROJECT_NAME} PRIVATE \${DIR_SRCS})
-        target_include_directories(\${PROJECT_NAME} PUBLIC \${PROJECT_SOURCE_DIR}/include)
         # target_link_directories(foo PUBLIC \${PROJECT_SOURCE_DIR}/lib)
+        # target_link_libraries(\${PROJECT_NAME} \${CONAN_LIBS})
 
-        set_target_properties(\${PROJECT_NAME}
-            PROPERTIES
-            ARCHIVE_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../lib"
-            LIBRARY_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../lib"
-            RUNTIME_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../bin"
-        )
+
+        foreach(_target \${PROJECT_NAME})
+            # target_sources({_target} PRIVATE )
+            target_include_directories(\${_target} PUBLIC \${PROJECT_SOURCE_DIR}/include)
+            set_target_properties(\${_target} PROPERTIES 
+                ARCHIVE_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../bin"
+                LIBRARY_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../bin"
+                RUNTIME_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/../bin"
+                RUNTIME_OUTPUT_DIRECTORY_DEBUG "\${CMAKE_BINARY_DIR}/../bin"
+                RUNTIME_OUTPUT_DIRECTORY_RELEASE "\${CMAKE_BINARY_DIR}/../bin"
+                RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "\${CMAKE_BINARY_DIR}/../bin"
+                LIBRARY_OUTPUT_DIRECTORY_DEBUG "\${CMAKE_BINARY_DIR}/../bin"
+                LIBRARY_OUTPUT_DIRECTORY_RELEASE "\${CMAKE_BINARY_DIR}/../bin"
+                LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "\${CMAKE_BINARY_DIR}/../bin"
+                ARCHIVE_OUTPUT_DIRECTORY_DEBUG "\${CMAKE_BINARY_DIR}/../bin"
+                ARCHIVE_OUTPUT_DIRECTORY_RELEASE "\${CMAKE_BINARY_DIR}/../bin"
+                ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "\${CMAKE_BINARY_DIR}/../bin"
+            )
+        endforeach()
     `;
 
     return getLines(cmake).join('\n');

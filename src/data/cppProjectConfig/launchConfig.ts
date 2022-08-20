@@ -5,14 +5,14 @@ interface ILaunchConfiguration {
     program: string;
     cwd: string;
     args: string[];
-    environment: { [key: string]: string }[];
     preLaunchTask: string;
-    stopAtEntry: boolean;
-    console: string;
-    consoleArgs: string[];
+    environment?: { [key: string]: string }[];
+    stopAtEntry?: boolean;
+    console?: string;
     // eslint-disable-next-line @typescript-eslint/naming-convention
     MIMode?: string;
     miDebuggerPath?: string;
+    setupCommands?: { [key: string]: boolean | string }[];
 }
 
 interface ILaunch {
@@ -28,7 +28,7 @@ function createDefaultLaunchConfiguration(): ILaunchConfiguration {
         program: "",
         args: [],
         stopAtEntry: true,
-        cwd: "${workspaceFolder}/bin",
+        cwd: "${workspaceFolder}",
         environment: [
             {
                 "name": "PATH",
@@ -36,8 +36,7 @@ function createDefaultLaunchConfiguration(): ILaunchConfiguration {
             }
         ],
         console: "internalConsole",
-        preLaunchTask: "",
-        consoleArgs: [],
+        preLaunchTask: ""
     };
 }
 
@@ -119,17 +118,87 @@ function createReleaseMingwConfiguration(programName: string): ILaunchConfigurat
     return config;
 }
 
-// if use windows, use msvc and mingw
-// if use linux, use gcc
+function createLLVMLaunchConfiguration(): ILaunchConfiguration {
+    const config: ILaunchConfiguration = createDefaultLaunchConfiguration();
+
+    config.name = "LLVMLaunch";
+    config.type = "lldb";
+    config.program = "${command:cmake.launchTargetPath}";
+    config.MIMode = "lldb";
+
+    delete config.console;
+    delete config.environment;
+    delete config.stopAtEntry;
+
+    return config;
+}
+
+function createGNULaunchConfiguration(): ILaunchConfiguration {
+    const config: ILaunchConfiguration = createDefaultLaunchConfiguration();
+
+    config.name = "GNULaunch";
+    config.type = "cppdbg";
+    config.program = "${command:cmake.launchTargetPath}";
+    config.MIMode = "gdb";
+    config.environment = [
+        {
+            // add the directory where our target was built to the PATHs
+            // it gets resolved by CMake Tools:
+            "name": "PATH",
+            "value": "${env:PATH}:${command:cmake.getLaunchTargetDirectory}"
+        },
+        {
+            "name": "OTHER_VALUE",
+            "value": "Something something"
+        }
+    ];
+    config.setupCommands = [
+        {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+        }
+    ];
+
+    return config;
+}
+
+function createMSVCLaunchConfiguration(): ILaunchConfiguration {
+    const config: ILaunchConfiguration = createDefaultLaunchConfiguration();
+
+    config.name = "MSVCLaunch";
+    config.type = "cppvsdbg";
+    config.program = "${command:cmake.launchTargetPath}";
+    config.environment = [
+        {
+            // add the directory where our target was built to the PATHs
+            // it gets resolved by CMake Tools:
+            "name": "PATH",
+            "value": "${env:PATH}:${command:cmake.getLaunchTargetDirectory}"
+        },
+        {
+            "name": "OTHER_VALUE",
+            "value": "Something something"
+        }
+    ];
+
+    return config;
+}
+
 export function createConfiguration(programName: string): ILaunchConfiguration[] {
     const configs: ILaunchConfiguration[] = [];
 
-    configs.push(createDebugMsvcConfiguration(programName));
-    configs.push(createDebugMingwConfiguration(programName));
-    configs.push(createReleaseMsvcConfiguration(programName));
-    configs.push(createReleaseMingwConfiguration(programName));
-    configs.push(createDebugGccConfiguration(programName));
-    configs.push(createReleaseGccConfiguration(programName));
+    // configs.push(createDebugMsvcConfiguration(programName));
+    // configs.push(createDebugMingwConfiguration(programName));
+    // configs.push(createReleaseMsvcConfiguration(programName));
+    // configs.push(createReleaseMingwConfiguration(programName));
+    // configs.push(createDebugGccConfiguration(programName));
+    // configs.push(createReleaseGccConfiguration(programName));
+
+    configs.push(createMSVCLaunchConfiguration());
+    configs.push(createGNULaunchConfiguration());
+    configs.push(createLLVMLaunchConfiguration());
+
 
     return configs;
 }

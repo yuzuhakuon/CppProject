@@ -1,3 +1,6 @@
+import * as path from "path";
+import * as fs from "fs";
+
 /**
  * get each line of content and trim the space
  */
@@ -37,4 +40,15 @@ export function trim(str: string, char: string): string {
     }
 
     return str.substring(start, end);
+}
+
+export function mkdirRecursive(dir: string) {
+    const pathArr = path.normalize(dir).split(path.sep);
+    let currentPath = "";
+    for (let i = 0; i < pathArr.length; i++) {
+        currentPath += pathArr[i] + path.sep;
+        if (!fs.existsSync(currentPath)) {
+            fs.mkdirSync(currentPath);
+        }
+    }
 }
