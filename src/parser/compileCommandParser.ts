@@ -12,7 +12,8 @@ interface ItemDefinition {
     name: string,
     includes: string[],
     defines: string[],
-    cppStandard: string,
+    options: string[],
+    cppStandard?: string,
 }
 
 interface CompileCommandConfig {
@@ -59,7 +60,8 @@ export class CompileCommandParser {
                 let name: string = "";
                 const includes: string[] = [];
                 const defines: string[] = [];
-                let cppStandard: string = "c++11";
+                const additionOptions: string[] = [];
+                let cppStandard: string = "c++17";
 
                 if (itemDefinitionGroup[i]._attributes.Condition) {
                     const rawName = itemDefinitionGroup[i]._attributes.Condition.split("==")[1].trim();
@@ -101,11 +103,34 @@ export class CompileCommandParser {
                     }
                 }
 
+                // CUDA Compile
+                if (itemDefinitionGroup[i].CudaCompile) {
+                    if (itemDefinitionGroup[i].CudaCompile.Include) {
+                        const include = itemDefinitionGroup[i].CudaCompile.Include;
+                        if (include._text) {
+                            include._text.split(';').forEach((element: string) => {
+                                fs.existsSync(element.trim()) && includes.push(element.trim());
+                            });
+                        }
+                    }
+
+                    if (itemDefinitionGroup[i].CudaCompile.Defines) {
+                        const define = itemDefinitionGroup[i].CudaCompile.Defines;
+                        if (define._text) {
+                            define._text.split(';').filter((element: string) => {
+                                var reg = /^[a-zA-Z0-9_]+$/;
+                                reg.test(element.trim()) && defines.push(element.trim());
+                            });
+                        }
+                    }
+                }
+
                 if (name) {
                     const item: ItemDefinition = {
                         name: name,
                         includes: [...new Set(includes)],
                         defines: [...new Set(defines)],
+                        options: [...new Set(additionOptions)],
                         cppStandard: cppStandard,
                     };
                     items.push(item);
@@ -122,16 +147,16 @@ export class CompileCommandParser {
 
         const itemGroup = json.Project.ItemGroup;
         for (let i = 0; i < itemGroup.length; i++) {
-            const item = itemGroup[i];
-            if (item.ClCompile) {
-                if (item.ClCompile._attributes) {
-                    const file = item.ClCompile._attributes.Include;
+            const compileFile = itemGroup[i].ClCompile || itemGroup[i].CudaCompile;
+            if (compileFile) {
+                if (compileFile._attributes) {
+                    const file = compileFile._attributes.Include;
                     if (file) {
                         files.push(file);
                     }
-                } else if (item.ClCompile.length) {
-                    for (let j = 0; j < item.ClCompile.length; j++) {
-                        const file = item.ClCompile[j]._attributes.Include;
+                } else if (compileFile.length) {
+                    for (let j = 0; j < compileFile.length; j++) {
+                        const file = compileFile[j]._attributes.Include;
                         if (file) {
                             files.push(file);
                         }
@@ -159,7 +184,9 @@ export class CompileCommandParser {
         for (let i = 0; i < defines.length; i++) {
             compileCommand.arguments.push("-D" + defines[i]);
         }
-        compileCommand.arguments.push("-std=" + cppStandard);
+        if (cppStandard) {
+            compileCommand.arguments.push("-std=" + cppStandard);
+        }
         compileCommand.arguments.push(...["-c", "-o", fileNameWithoutExtension + ".o", file]);
 
         return compileCommand;
